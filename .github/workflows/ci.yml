@@ -18,6 +18,11 @@ jobs:
         run: |
           sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
+          cd todo-backend
+          git pull origin main 
+          docker-compose down
+          docker-compose up -d
+
           docker-compose --version
 
       - name: Docker Compose bilan ishga tushirish
@@ -25,6 +30,6 @@ jobs:
 
       - name: Server ishga tushishini kutish
         run: sleep 10
-        
+
       - name: Tozalash
         run: docker-compose down
