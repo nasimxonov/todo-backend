@@ -17,6 +17,7 @@ export class TodosController {
 
   @Post()
   create(@Body() body: CreateDto) {
+    console.log(121212);
     return this.todosService.create(body);
   }
 
