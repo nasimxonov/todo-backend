@@ -18,7 +18,7 @@ jobs:
         run: docker build -t todo-backend .
 
       - name: Docker container ishga tushurish
-        run: docker run -d -p 3000:3000 --name todo-backend-container todo-backend
+        run: docker run -d -p 3000:4000 --name todo-backend-container todo-backend
 
       - name: 5 soniya kutish (server ishga tushishi uchun)
         run: sleep 5
