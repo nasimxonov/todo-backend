@@ -1,35 +1,28 @@
-name: CI for NestJS Todo Backend
+name: Deploy to Server
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Kodni yuklash
-        uses: actions/checkout@v3
-
-      - name: Docker Compose o‘rnatish
+      - name: Deploy to server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          cd todo-backend
-          git pull origin main 
-          docker-compose down
-          docker-compose up -d
+          echo "$SSH_PRIVATE_KEY" > todo.pem
+          chmod 600 todo.pem
+          ssh -i todo.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST '
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+              -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
 
-          docker-compose --version
+            cd /home/ubuntu/todo-backend
+            git pull origin main
 
-      - name: Docker Compose bilan ishga tushirish
-        run: docker-compose up -d
-
-      - name: Server ishga tushishini kutish
-        run: sleep 10
-
-      - name: Tozalash
-        run: docker-compose down
+            sudo docker-compose down
+            sudo docker-compose up --build -d
